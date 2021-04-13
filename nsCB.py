@@ -1,5 +1,5 @@
 ## ns-pCB (number station - project Cherry Blossom)
-## Developed by Zach Matcham (zatcham) and Tom Sangster (tomrow)
+## Developed by Zach Matcham (zatcham)
 ## Version 0.2a | 13/4/21
 
 # Imports
@@ -17,7 +17,7 @@ from tscipherlib import cencodeh
 import nsCB_otpgen
 
 # Variables
-main_dir = "/Users/zachmatcham/Documents/ns1z"
+main_dir = ""
 date_file = ""
 num_csv = {}
 lc_csv = {}
@@ -27,6 +27,9 @@ strotp_list = []
 # imported here to remove msg
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer # install from pip
+
+main_dir = os.getcwd()
+print (main_dir)
 
 # Functions 
 # 1 - Ancillary
