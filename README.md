@@ -5,7 +5,7 @@ A Python-based OTP generator and encoder, which can output MP3s to serve as a nu
 ### Dependancies
 
 ##### Bundled with
-  * ns-PCB1_OTP
+  * ns-pCB1_OTP
   * tscipherlib (https://github.com/tomrow/tscipherlib)
 ##### To be installed via Pip:
   * pandas
