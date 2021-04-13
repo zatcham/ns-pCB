@@ -9,6 +9,7 @@ import pandas as pd
 from fpdf import FPDF
 from pydub import AudioSegment
 from tscipherlib import *
+import nsCB1_otpgen
 
 # Variables
 main_dir = "/Users/zachmatcham/Documents/ns1z"
@@ -110,6 +111,8 @@ def stringToOTP(s):
                         k = str(uc_csv[key])
                         print (str(e) + " -> " + k)
                         strotp_list.append(k) 
+            elif e.isspace():
+                strotp_list.append("--")
             else:
                 print("Error. Make sure there is no special chars")
 
@@ -140,6 +143,9 @@ def generatePDF():
         col_width = page_width/4
         pdf.ln(1)
         th = pdf.font_size
+        pdf.ln(4)
+        pdf.cell(page_width, 10.0, 'Double hyphen = space ', align='L')
+        pdf.ln(10)
         pdf.ln(4)
         pdf.cell(page_width, 10.0, 'Numbers: ', align='L')
         pdf.ln(10)
@@ -180,8 +186,8 @@ def mergeAudio():
 # 2 - Mains
 
 def showMenu():
-    print ("Welcome to ns-pCB1 \n")
     menu = True
+    print ("Welcome to ns-pCB1 \n")
     while menu:
         menu = input ("Select an option: \n 1. TTS Generation \n 2. TTS Output \n 3. OTP Generation \n 4. Convert OTP into PDF \n 5. Exit\n")
         if menu == "1":
@@ -196,7 +202,7 @@ def showMenu():
         elif menu == "4":
             generatePDF()
         elif menu !="":
-            print("wrong try again")
+            print("Incorrect input, try again")
         else:
             showMenu()
 
@@ -212,7 +218,13 @@ def ttsOutMain():
     print ("Not done")
 
 def otpGenMain():
-    print ("Not done")
+    print ("\n ns-pCB1 - OTP Generation \n")
+    print ("Warning: By running this, all future TTS Generations will require the new OTP.")
+    q = input("To continue, enter Y, or to return to main menu, press any other key: ")
+    if q == "Y":
+        print ("\n")
+        nsCB1_otpgen.otp_main()
+        print ("\n")
 
 def main():
     print ("ns-pCB1 Initialisation:")
@@ -220,6 +232,7 @@ def main():
         print ("Main directory does not exist, exiting")
         print ("Make sure " + main_dir + " exists and /audio")
     elif checkFilePaths() == True:
+        print ("Init done \n")
         showMenu()
         
 main()
