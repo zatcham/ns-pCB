@@ -14,7 +14,7 @@ import pandas as pd
 from fpdf import FPDF
 from pydub import AudioSegment
 from tscipherlib import cencodeh
-import nsCB1_otpgen
+import nsCB_otpgen
 
 # Variables
 main_dir = "/Users/zachmatcham/Documents/ns1z"
