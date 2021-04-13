@@ -1,3 +1,8 @@
+## ns-pCB1 (number station - project Cherry Blossom)
+## OTP Generation module
+## Developed by Zach Matcham (zatcham)
+## Version 0.3 | 13/4/21
+
 import sys
 import time
 import csv
