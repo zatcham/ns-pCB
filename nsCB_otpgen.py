@@ -1,4 +1,4 @@
-## ns-pCB1 (number station - project Cherry Blossom)
+## ns-pCB (number station - project Cherry Blossom)
 ## OTP Generation module
 ## Developed by Zach Matcham (zatcham)
 ## Version 0.3 | 13/4/21
@@ -139,44 +139,21 @@ def otp_main():
     generateUA()
 
     # CSV out
-
     date_fn = str(generateDate())
     print ("Exporting OTPs to CSV")
     print ("File names will be: \n Numbers: OTPNum-" + date_fn + ".csv" 
     "\n Lowercase: OTPLC-" + date_fn + ".csv" + 
     "\n Uppercase: OTPUC-" + date_fn + ".csv")
-
     touch("otp/OTPNum-" + date_fn + ".csv")
     touch("otp/OTPLC-" + date_fn + ".csv")
     touch("otp/OTPUC-" + date_fn + ".csv")
 
     nf = pd.DataFrame.from_dict(numbers, orient="index")
     nf.to_csv("otp/OTPNum-" + date_fn + ".csv")
-
     lcf = pd.DataFrame.from_dict(lower_alphabet, orient="index")
     lcf.to_csv("otp/OTPLC-" + date_fn + ".csv")
-
     ucf = pd.DataFrame.from_dict(upper_alphabet, orient="index")
     ucf.to_csv("otp/OTPUC-" + date_fn + ".csv")
-
-    """
-    "\n Lowercase: OTPLC-" + date_fn + ".csv" + 
-    "\n Uppercase: OTPUC-" + date_fn + ".csv")
-    with open("otp/OTPNum-" + date_fn + ".csv", 'w') as f:
-        w = csv.DictWriter(f, numbers.keys())
-        w.writeheader()
-        w.writerow(numbers)
-
-    with open("otp/OTPLC-" + date_fn + ".csv", 'w') as f:
-        w = csv.DictWriter(f, lower_alphabet.keys())
-        w.writeheader()
-        w.writerow(lower_alphabet)
-
-    with open("otp/OTPUC-" + date_fn + ".csv", 'w') as f:
-        w = csv.DictWriter(f, upper_alphabet.keys())
-        w.writeheader()
-        w.writerow(upper_alphabet)
- """
 
 if __name__ == "__main__":
     otp_main()
