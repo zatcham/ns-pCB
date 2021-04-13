@@ -137,7 +137,7 @@ def hasNumbers(inputString):
 
 # generates pdf for otps based off csv using fpdf
 def generatePDF():
-    print ("\n ns-pCB1 - OTP PDF Creation \n")
+    print ("\n ns-pCB - OTP PDF Creation \n")
     print ("Generating PDFs from latest OTP CSVs \n")
     date_now = datetime.now()
     date_1 = date_now.strftime("%d/%m/%y %H:%M:%S")
@@ -155,7 +155,7 @@ def generatePDF():
         pdf.add_page()
         page_width = pdf.w - 2 * pdf.l_margin
         pdf.set_font('Courier', '', 14.0) 
-        pdf.cell(page_width, 0.0, 'OTP - Exported: ' + date_1, align='C')
+        pdf.cell(page_width, 0.0, 'ns-pCB OTP - Exported: ' + date_1, align='C')
         pdf.ln(10)
         pdf.set_font('Courier', '', 12)
         col_width = page_width/4
@@ -207,7 +207,7 @@ def mergeAudio():
 # main menu
 def showMenu():
     menu = True
-    print ("Welcome to ns-pCB1 \n")
+    print ("Welcome to ns-pCB \n")
     while menu:
         menu = input ("Select an option: \n 1. TTS Generation \n 2. TTS Output (not yet implamented) \n 3. OTP Generation \n 4. Convert OTP into PDF \n 5. Exit\n")
         if menu == "1":
@@ -227,7 +227,7 @@ def showMenu():
             showMenu()
 
 def ttsGenMain():
-    print ("\n ns-pCB1 - TTS Generation \n")
+    print ("\n ns-pCB - TTS Generation \n")
     importCSVs()
     st = input ("String to convert (no special chars): ")
     stringToOTP(st)
@@ -239,7 +239,7 @@ def ttsOutMain():
     print ("Not done")
 
 def otpGenMain():
-    print ("\n ns-pCB1 - OTP Generation \n")
+    print ("\n ns-pCB - OTP Generation \n")
     print ("Warning: By running this, all future TTS Generations will require the new OTP.")
     q = input("To continue, enter Y, or to return to main menu, press any other key: ")
     if q == "Y":
@@ -248,7 +248,7 @@ def otpGenMain():
         print ("\n")
 
 def main():
-    print ("ns-pCB1 Initialisation:")
+    print ("ns-pCB Initialisation:")
     if checkFilePaths() == False:
         print ("Main directory does not exist, exiting")
         print ("Make sure " + main_dir + " exists and /audio")
