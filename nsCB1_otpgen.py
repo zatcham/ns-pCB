@@ -125,7 +125,7 @@ def generateUA():
 def touch(path):
     open(path, 'a').close()
 
-def main():
+def otp_main():
     print ("Generating Numbers")
     generateNum()
     print ("Generating lowercase alphabet")
@@ -172,4 +172,6 @@ def main():
         w.writeheader()
         w.writerow(upper_alphabet)
  """
-main()
+
+if __name__ == "__main__":
+    otp_main()
