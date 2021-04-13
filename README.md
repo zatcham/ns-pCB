@@ -32,9 +32,9 @@ It will create 3 CSVs, with the file name containing the date and time of genera
   * gTTS
 
 ### TODO
- * Integrate OTP Generation into main program
+ * ✅ Integrate OTP Generation into main program
  * Integrate tscipherlib
  * Decoding
  * Web-based decoding
  * Finish playback
- * Remove hardcoded directories
+ * ✅ Remove hardcoded directories
