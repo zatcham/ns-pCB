@@ -7,7 +7,7 @@ import sys
 import os
 import csv
 import re
-from gtts import gTTS # pip - tts engine
+from gtts import gTTS
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
@@ -244,7 +244,7 @@ def otpGenMain():
     q = input("To continue, enter Y, or to return to main menu, press any other key: ")
     if q == "Y":
         print ("\n")
-        nsCB1_otpgen.otp_main()
+        nsCB_otpgen.otp_main()
         print ("\n")
 
 def main():
