@@ -1,4 +1,4 @@
-## ns-pCB1 (number station - project Cherry Blossom 1)
+## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham) and Tom Sangster (tomrow)
 ## Version 0.2a | 13/4/21
 
