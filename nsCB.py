@@ -1,6 +1,6 @@
 ## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham)
-## Version 0.2a | 13/4/21
+## Version 0.26a | 13/4/21
 
 # Imports
 import sys
@@ -28,8 +28,8 @@ strotp_list = []
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer # install from pip
 
+# assign main dir to cwd
 main_dir = os.getcwd()
-print (main_dir)
 
 # Functions 
 # 1 - Ancillary
@@ -87,7 +87,6 @@ def importCSVs():
     lc_latest = max([fn for fn in p.glob('*OTPLC*.csv')], key=lambda f: f.stat().st_mtime)
     uc_latest = max([fn for fn in p.glob('*OTPUC*.csv')], key=lambda f: f.stat().st_mtime)
 
-    # num_reader = csv.DictReader(open(num_latest, 'r'))
     global num_csv
     num_csv = pd.read_csv(num_latest, dtype={"a": int, "b": int}, header=None, index_col=0, squeeze=True).to_dict()
     print (num_csv)
@@ -202,6 +201,48 @@ def mergeAudio():
     date_file = (main_dir + "/audio/" + date_1 +  "-merge.mp3")
     out.export(date_file, format="mp3")
 
+def checkOTPUsage():
+    if os.path.isfile("otp.cb"):
+        f = open("otp.cb", "r")
+        g = f.readline()
+        g = int(g)
+        print (str(g))
+        if g >= 1:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def incOTPUsage(m):
+    # inc
+    if m == "i":
+        if os.path.isfile("otp.cb"):
+            f = open("otp.cb", "r")
+            g = f.readline()
+            g = int(g)
+            g = g+1
+            f.close()
+            f = open("otp.cb", "w")
+            f.write(str(g))
+            f.close()
+        else:
+            f = open("otp.cb", "w")
+            f.write("1")
+            f.close()
+    # clr
+    elif m == "c":
+        if os.path.isfile("otp.cb"):
+            f = open("otp.cb", "w")
+            f.write("0")
+            f.close()
+        else:
+            f = open("otp.cb", "w")
+            f.write("0")
+            f.close()
+
+
+
 # 2 - Mains
 
 # main menu
@@ -228,12 +269,29 @@ def showMenu():
 
 def ttsGenMain():
     print ("\n ns-pCB - TTS Generation \n")
-    importCSVs()
-    st = input ("String to convert (no special chars): ")
-    stringToOTP(st)
-    print(strotp_list)
-    generateTTS(str(strotp_list))
-    mergeAudio()
+    if checkOTPUsage() == True:
+        print ("This OTP has been used for. Continue?")
+        x = input("Y for Yes, or any key to go back")
+        if x == "Y": 
+            importCSVs()
+            st = input ("String to convert (no special chars): ")
+            strotp_list.clear()
+            stringToOTP(st)
+            print(strotp_list)
+            generateTTS(str(strotp_list))
+            mergeAudio()
+            incOTPUsage("i")
+    else:
+        print ("OTP not used before, proceeding.")
+        importCSVs()
+        st = input ("String to convert (no special chars): ")
+        strotp_list.clear()
+        stringToOTP(st)
+        print(strotp_list)
+        generateTTS(str(strotp_list))
+        mergeAudio()
+        incOTPUsage("i")
+
 
 def ttsOutMain():
     print ("Not done")
@@ -245,6 +303,7 @@ def otpGenMain():
     if q == "Y":
         print ("\n")
         nsCB_otpgen.otp_main()
+        incOTPUsage("c")
         print ("\n")
 
 def main():
