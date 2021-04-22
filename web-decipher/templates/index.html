@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="text-center">{% block title %} Welcome to ns-pCB Decryptor {% endblock %}</h1>
+    
+    <form method="POST" name="mainForm">
+
+        <div class="form-group">
+          <label for="inputKey">Encryption key:</label>
+          <input type="text" class="form-control" id="inputKey" name="inputKey" placeholder="Enter key">
+        </div>
+
+        <div class="form-group"> 
+          <label for="inputEncText">Encrypted string:</label>
+          <input type="text" class="form-control" id="inputEncText" name="inputEncText" placeholder="Enter string">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+      </form>
+
+{% endblock %}
