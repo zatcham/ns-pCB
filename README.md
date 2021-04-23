@@ -35,6 +35,8 @@ It will create 3 CSVs, with the file name containing the date and time of genera
  * ✅ Integrate OTP Generation into main program
  * Integrate tscipherlib
  * Decoding
- * Web-based decoding
+ * 🟡 Web-based decoding (decipher done, but CSV decoding is in progress)
  * Finish playback
  * ✅ Remove hardcoded directories
+ * Configuration file
+ * ✅ OTP usage count
