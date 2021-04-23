@@ -1,0 +1,11 @@
+# ns-pCB Config File
+#
+# Please read the conf_README before changing any options
+[TTS]
+tts_tld = co.uk
+
+[Audio]
+preamble_fn = preamble.mp3
+
+[Station]
+station_ident = 001
