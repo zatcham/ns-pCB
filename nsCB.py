@@ -1,6 +1,6 @@
 ## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham)
-## Version 0.26a | 13/4/21
+## Version 0.32a | 23/4/21
 
 # Imports
 import sys
@@ -13,8 +13,10 @@ from pathlib import Path
 import pandas as pd
 from fpdf import FPDF
 from pydub import AudioSegment
+import configparser
 from tscipherlib import cencodeh
 import nsCB_otpgen
+
 
 # Variables
 main_dir = ""
@@ -54,7 +56,7 @@ def generateDate():
 # Generates TTS MP3s from string 
 def generateTTS(phrase):
     tts_lang = "en"
-    tts_tld = "com.au"
+    tts_tld = fc_ttstld
     tts_obj = gTTS(text=phrase, lang=tts_lang, tld=tts_tld, slow=False)
     fname = generateDate()
     tts_obj.save(fname)
@@ -64,7 +66,7 @@ def generateTTS(phrase):
 # Preamble playback - Most likely not needed due to combine
 def playPreamble():
     mixer.init()
-    mixer.music.load(main_dir + "/audio/preamble.mp3")
+    mixer.music.load(main_dir + "/audio/" + fc_prefn)
     mixer.music.play()
 
 # Plays audio file
@@ -241,7 +243,15 @@ def incOTPUsage(m):
             f.write("0")
             f.close()
 
-
+def parseConfig():
+    conf = configparser.ConfigParser()
+    conf.read("config.cb")
+    global fc_ttstld
+    fc_ttstld = conf.get("TTS", "tts_tld")
+    global fc_prefn
+    fc_prefn = conf.get("Audio", "preamble_fn")
+    global fc_statidnt
+    fc_statidnt = conf.get("Station", "station_ident")
 
 # 2 - Mains
 
@@ -262,6 +272,10 @@ def showMenu():
             menu = None
         elif menu == "4":
             generatePDF()
+        elif menu == "t":
+            print ("Testing")
+            parseConfig()
+            generateTTS("Test")
         elif menu !="":
             print("Incorrect input, try again")
         else:
@@ -278,7 +292,8 @@ def ttsGenMain():
             strotp_list.clear()
             stringToOTP(st)
             print(strotp_list)
-            generateTTS(str(strotp_list))
+            outtotts = fc_statidnt + "   " + str(strotp_list)
+            generateTTS(outtotts)
             mergeAudio()
             incOTPUsage("i")
     else:
