@@ -11,8 +11,8 @@ The config file can be opened in any decent text editor (so this excludes vim ðŸ
   -    Default setting: `google`
   -    Options:
               This changes what TTS engine to use, you can choose between `nscb` and `google`
-              `nscb` is the custom engine that comes with this project, it purely concatenates audio recordings of numbers into a single MP3 file. More information about this can be found within `tts_readme.md`
-              `google` provides more flexiblity and has some differences, but does require an internet connection, whilst `nscb` does not.
+              `nscb` is the custom engine that comes with this project, it purely concatenates audio recordings of numbers into a single MP3 file. More information                 about this can be found within `tts_readme.md`.     
+               `google` provides more flexiblity and has some differences, but does require an internet connection, whilst `nscb` does not.
 - `tts_tld` :
   -    Default setting: `co.uk`
   -    Options:
