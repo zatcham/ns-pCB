@@ -2,6 +2,7 @@
 #
 # Please read the conf_README before changing any options
 [TTS]
+tts_mode = google
 tts_tld = co.uk
 
 [Audio]
