@@ -1,6 +1,6 @@
 ## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham)
-## Version 0.32a | 23/4/21
+## Version 0.4a | 30/4/21
 
 # Imports
 import sys
@@ -16,6 +16,7 @@ from pydub import AudioSegment
 import configparser
 from tscipherlib import cencodeh
 import nsCB_otpgen
+import nsCB_tts
 
 
 # Variables
@@ -55,12 +56,26 @@ def generateDate():
 
 # Generates TTS MP3s from string 
 def generateTTS(phrase):
-    tts_lang = "en"
-    tts_tld = fc_ttstld
-    tts_obj = gTTS(text=phrase, lang=tts_lang, tld=tts_tld, slow=False)
-    fname = generateDate()
-    tts_obj.save(fname)
-    print ("Time code is " + fname)
+    if fc_ttstype == "google":
+        tts_lang = "en"
+        tts_tld = fc_ttstld
+        tts_obj = gTTS(text=phrase, lang=tts_lang, tld=tts_tld, slow=False)
+        fname = generateDate()
+        tts_obj.save(fname)
+        print ("Time code is " + fname)
+    elif fc_ttstype == "nscb":
+        if fc_nscbmode == "morse":
+            print ("Morse mode selected")
+            tgen = nsCB_tts.generateMorseAud(phrase)
+            fname = generateDate()
+            tgen.export(fname, format="mp3")
+            print ("Time code is " + fname)
+        elif fc_nscbmode == "speech":
+            print ("Speech mode selected")
+            tgen = nsCB_tts.generateTTS(phrase)
+            fname = generateDate()
+            tgen.export(fname, format="mp3")
+            print ("Time code is " + fname)
 
 # Audio playback - Not yet implamented
 # Preamble playback - Most likely not needed due to combine
@@ -85,21 +100,26 @@ def runSpeak():
 def importCSVs():
     # Find latest OTPs
     p = Path (main_dir + "/otp/")
-    num_latest = max([fn for fn in p.glob('*OTPNum*.csv')], key=lambda f: f.stat().st_mtime)
-    lc_latest = max([fn for fn in p.glob('*OTPLC*.csv')], key=lambda f: f.stat().st_mtime)
-    uc_latest = max([fn for fn in p.glob('*OTPUC*.csv')], key=lambda f: f.stat().st_mtime)
+    try:
+        num_latest = max([fn for fn in p.glob('*OTPNum*.csv')], key=lambda f: f.stat().st_mtime)
+        lc_latest = max([fn for fn in p.glob('*OTPLC*.csv')], key=lambda f: f.stat().st_mtime)
+        uc_latest = max([fn for fn in p.glob('*OTPUC*.csv')], key=lambda f: f.stat().st_mtime)
+        global num_csv
+        num_csv = pd.read_csv(num_latest, dtype={"a": int, "b": int}, header=None, index_col=0, squeeze=True).to_dict()
+        print (num_csv)
 
-    global num_csv
-    num_csv = pd.read_csv(num_latest, dtype={"a": int, "b": int}, header=None, index_col=0, squeeze=True).to_dict()
-    print (num_csv)
+        global lc_csv
+        lc_csv = pd.read_csv(lc_latest, header=None, index_col=0, squeeze=True,).to_dict()
+        print (lc_csv)
 
-    global lc_csv
-    lc_csv = pd.read_csv(lc_latest, header=None, index_col=0, squeeze=True,).to_dict()
-    print (lc_csv)
+        global uc_csv
+        uc_csv = pd.read_csv(uc_latest, header=None, index_col=0, squeeze=True,).to_dict()
+        print (uc_csv)
 
-    global uc_csv
-    uc_csv = pd.read_csv(uc_latest, header=None, index_col=0, squeeze=True,).to_dict()
-    print (uc_csv)
+    except ValueError as error:
+        print ("Error, most likely missing OTP file")
+        print (error)
+        return "err"
 
 # covert string to otp via dict
 def stringToOTP(s):
@@ -252,6 +272,10 @@ def parseConfig():
     fc_prefn = conf.get("Audio", "preamble_fn")
     global fc_statidnt
     fc_statidnt = conf.get("Station", "station_ident")
+    global fc_ttstype
+    fc_ttstype = conf.get("TTS", "tts_mode")
+    global fc_nscbmode
+    fc_nscbmode = conf.get("TTS", "nscb_mode")
 
 # 2 - Mains
 
@@ -287,15 +311,17 @@ def ttsGenMain():
         print ("This OTP has been used for. Continue?")
         x = input("Y for Yes, or any key to go back")
         if x == "Y": 
-            importCSVs()
-            st = input ("String to convert (no special chars): ")
-            strotp_list.clear()
-            stringToOTP(st)
-            print(strotp_list)
-            outtotts = fc_statidnt + "   " + str(strotp_list)
-            generateTTS(outtotts)
-            mergeAudio()
-            incOTPUsage("i")
+            if importCSVs() == "err":
+                print ("")
+            else:
+                st = input ("String to convert (no special chars): ")
+                strotp_list.clear()
+                stringToOTP(st)
+                print(strotp_list)
+                outtotts = fc_statidnt + "   " + str(strotp_list)
+                generateTTS(outtotts)
+                mergeAudio()
+                incOTPUsage("i")
     else:
         print ("OTP not used before, proceeding.")
         importCSVs()

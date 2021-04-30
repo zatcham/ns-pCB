@@ -127,6 +127,23 @@ def generateUA():
             upper_alphabet.update({key: ranGen()})
         print(key, '->', upper_alphabet[key])
 
+def checkForDuplicate():
+    i = 25
+    while i < 26:
+        if lower_alphabet[i] == upper_alphabet[i]:
+            print ("Duplicate!")
+            exit()
+        elif lower_alphabet[i] == numbers[i]:
+            print ("Duplicate!")
+            exit()
+        elif upper_alphabet[i] == numbers[i]:
+            print ("Duplicate!")
+            exit()
+        else:
+            i += 1
+
+
+
 def touch(path):
     open(path, 'a').close()
 
