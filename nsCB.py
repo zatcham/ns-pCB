@@ -1,6 +1,6 @@
 ## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham)
-## Version 0.4a | 30/4/21
+## Version 0.41a | 1/5/21
 
 # Imports
 import sys
@@ -66,7 +66,7 @@ def generateTTS(phrase):
     elif fc_ttstype == "nscb":
         if fc_nscbmode == "morse":
             print ("Morse mode selected")
-            tgen = nsCB_tts.generateMorseAud(phrase)
+            tgen = nsCB_tts.generateMorseLoop(phrase)
             fname = generateDate()
             tgen.export(fname, format="mp3")
             print ("Time code is " + fname)
@@ -267,7 +267,7 @@ def parseConfig():
     conf = configparser.ConfigParser()
     conf.read("config.cb")
     global fc_ttstld
-    fc_ttstld = conf.get("TTS", "tts_tld")
+    fc_ttstld = conf.get("TTS", "google_tld")
     global fc_prefn
     fc_prefn = conf.get("Audio", "preamble_fn")
     global fc_statidnt
@@ -299,7 +299,7 @@ def showMenu():
         elif menu == "t":
             print ("Testing")
             parseConfig()
-            generateTTS("Test")
+            generateTTS("1 2 345")
         elif menu !="":
             print("Incorrect input, try again")
         else:

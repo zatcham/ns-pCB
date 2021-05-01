@@ -4,11 +4,11 @@
 [TTS]
 tts_mode = nscb
 google_tld = co.uk
-nscb_mode = morse
+nscb_mode = speech
 morse_delay1 = 500
 morse_delay2 = 500
 morse_delay3 = 1000
-morse_loop = 1
+morse_loop = 2
 morseloop_delay1 = 1000
 morseloop_delay2 = 1000
 
