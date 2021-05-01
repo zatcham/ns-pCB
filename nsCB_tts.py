@@ -6,6 +6,7 @@
 import os
 from pydub import AudioSegment
 from datetime import datetime
+import configparser
 
 morse_dict = {'A':'.-', 'B':'-...', 'C':'-.-.', 
                 'D':'-..', 'E':'.', 'F':'..-.', 
@@ -81,7 +82,7 @@ def generateMorseTxt(morsein):
 def generateMorseAud(moresin):
     m = generateMorseTxt(moresin)
     temp = AudioSegment.empty()
-    silence = AudioSegment.silent(duration=500)
+    silence = AudioSegment.silent(duration=float(fc_md1))
     for element in m:
         if element == "-":
             a1 = AudioSegment.from_mp3("tts_gen/morse/dash.mp3")
@@ -92,7 +93,10 @@ def generateMorseAud(moresin):
             temp += a1
             temp += silence
         elif element == " ":
-            s1 = AudioSegment.silent(duration=500)
+            s1 = AudioSegment.silent(duration=float(fc_md2))
+            temp += s1
+        elif element == "  ":
+            s1 = AudioSegment.silent(duration=float(fc_md3))
             temp += s1
     if __name__ == "__main__":
         date_now = datetime.now()
@@ -118,13 +122,48 @@ def checkForFiles():
         print ("none")
     print ("x")
 
+def checkConfig():
+    conf = configparser.ConfigParser()
+    conf.read("config.cb")
+    global fc_md1
+    fc_md1 = conf.get("TTS", "morse_delay1")
+    global fc_md2
+    fc_md2 = conf.get("TTS", "morse_delay2")
+    global fc_md3
+    fc_md3 = conf.get("TTS", "morse_delay3")
+    global fc_mld1
+    fc_mld1 = conf.get("TTS", "morseloop_delay1")
+    global fc_mld2
+    fc_mld2 = conf.get("TTS", "morseloop_delay2")
+
 def generateMorse(x):
+    checkConfig()
     a = generateMorseTxt(x)
-    return generateMorseAud(a)
+    b = generateMorseAud(x)
+    return b
+
+def generateMorseLoop(x, y): # dont use this in main
+    checkConfig()
+    z = 0
+    print (generateMorseTxt(x))
+    silence = AudioSegment.silent(float(fc_mld1))
+    b = generateMorseAud(x)
+    c = AudioSegment.empty()
+    while y > z:
+        c += b
+        c += AudioSegment.silent(float(fc_mld2))
+        print(y)
+        print(z)
+        z += 1
+        print(z)
+    if y > 1:
+        c += silence
+    return c
 
 if __name__ == "__main__":
     a = input ("Enter string: ")
     # generateTTS(a)
     checkForFiles()
+    checkConfig()   
     print (generateMorseTxt(a))
     generateMorseAud(a)
