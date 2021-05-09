@@ -28,8 +28,9 @@ It will create 3 CSVs, with the file name containing the date and time of genera
 ##### To be installed via Pip:
   * pandas
   * fpdf
-  * pydub (also requires ffmpeg)
+  * pydub (also requires ffmpeg : https://www.ffmpeg.org/download.html)
   * gTTS
+  * Pygame
 
 ### TODO
  * ✅ Integrate OTP Generation into main program
