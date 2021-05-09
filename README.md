@@ -39,5 +39,5 @@ It will create 3 CSVs, with the file name containing the date and time of genera
  * 🟡 Web-based decoding (decipher done, but CSV decoding is in progress)
  * Finish playback
  * ✅ Remove hardcoded directories
- * Configuration file
+ * ✅ Configuration file
  * ✅ OTP usage count
