@@ -13,7 +13,10 @@ morseloop_delay1 = 1000
 morseloop_delay2 = 1000
 
 [Audio]
-preamble_fn = preamble.mp3
+preamble_fn = preamble-al.mp3
 
 [Station]
 station_ident = 001
+
+[OTP]
+cipher_type = nspcb

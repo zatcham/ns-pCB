@@ -1,6 +1,6 @@
 ## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham)
-## Version 0.41a | 1/5/21
+## Version 0.42a | 11/5/21
 
 # Imports
 import sys
@@ -14,7 +14,7 @@ import pandas as pd
 from fpdf import FPDF
 from pydub import AudioSegment
 import configparser
-from tscipherlib import cencodeh
+from tscipherlib import cencode
 import nsCB_otpgen
 import nsCB_tts
 
@@ -41,8 +41,11 @@ main_dir = os.getcwd()
 def checkFilePaths():
     if os.path.exists(main_dir):
         if os.path.exists(main_dir + "/audio"):
-            if os.path.exists(main_dir + "/audio/" + fc_prefn):
-                return True
+            if os.path.exists(main_dir + "/otp"):
+                if os.path.exists(main_dir + "/audio/" + fc_prefn):
+                    return True
+                else:
+                    return False
             else:
                 return False
         else:
@@ -224,7 +227,7 @@ def generatePDF():
 def mergeAudio():
     p = Path (main_dir + "/audio/")
     s1 = AudioSegment.from_mp3(max([fn for fn in p.glob('*.mp3')], key=lambda f: f.stat().st_mtime))
-    s2 = AudioSegment.from_mp3("audio/preamble.mp3")
+    s2 = AudioSegment.from_mp3(main_dir + "/audio/" + fc_prefn)
     silence = AudioSegment.silent(duration=2000)
     out = s2 + silence + s1
     date_now = datetime.now()
@@ -285,6 +288,8 @@ def parseConfig():
     fc_ttstype = conf.get("TTS", "tts_mode")
     global fc_nscbmode
     fc_nscbmode = conf.get("TTS", "nscb_mode")
+    global fc_cmode
+    fc_cmode = conf.get("OTP", "cipher_type")
 
 # 2 - Mains
 
@@ -318,7 +323,7 @@ def ttsGenMain():
     print ("\n ns-pCB - TTS Generation \n")
     if checkOTPUsage() == True:
         print ("This OTP has been used for. Continue?")
-        x = input("Y for Yes, or any key to go back")
+        x = input("Y for Yes, or any key to go back ")
         if x == "Y": 
             if importCSVs() == "err":
                 print ("Please generate an OTP file and try again.\n")
@@ -327,12 +332,30 @@ def ttsGenMain():
                 strotp_list.clear()
                 stringToOTP(st)
                 print(strotp_list)
-                outtotts = fc_statidnt + "   " + str(strotp_list)
-                generateTTS(outtotts)
-                mergeAudio()
-                incOTPUsage("i")
+                if fc_cmode == "tscipherlib":
+                    print ("tscipherlib selected as cipher mechanism")
+                    a = input("Enter key to cipher with (must be an integer): ")
+                    otp_str = ""
+                    for element in strotp_list:
+                        otp_str += element
+                        otp_str += ","
+                    outtotts = fc_statidnt + "   " + str(cencode(otp_str, int(a)))
+                    print (outtotts)
+                    generateTTS(outtotts)
+                    mergeAudio()
+                    incOTPUsage("i")
+                elif fc_cmode == "nspcb":
+                    print ("nspcb selected as cipher mechanism")
+                    outtotts = fc_statidnt + "   " + str(strotp_list)
+                    generateTTS(outtotts)
+                    mergeAudio()
+                    incOTPUsage("i")
+                elif fc_cmode == "vernam":
+                    print ("Vernam selected as cipher mechanism")
+                    print ("not complete")
+                else:
+                    print ("No cipher mechanism specifed in config file, returning to main menu")
     else:
-        
         print ("OTP not used before, proceeding.")
         if importCSVs() == "err":
             print ("Please generate an OTP file and try again.\n")
@@ -341,10 +364,29 @@ def ttsGenMain():
             strotp_list.clear()
             stringToOTP(st)
             print(strotp_list)
-            generateTTS(str(strotp_list))
-            mergeAudio()
-            incOTPUsage("i")
-
+            if fc_cmode == "tscipherlib":
+                print("tscipherlib selected as cipher mechanism")
+                a = input("Enter key to cipher with (must be an integer): ")
+                otp_str = ""
+                for element in strotp_list:
+                    otp_str += element
+                    otp_str += ","
+                outtotts = fc_statidnt + "   " + str(cencode(otp_str, int(a)))
+                print(outtotts)
+                generateTTS(outtotts)
+                mergeAudio()
+                incOTPUsage("i")
+            elif fc_cmode == "nspcb":
+                print("nspcb selected as cipher mechanism")
+                outtotts = fc_statidnt + "   " + str(strotp_list)
+                generateTTS(outtotts)
+                mergeAudio()
+                incOTPUsage("i")
+            elif fc_cmode == "vernam":
+                print("Vernam selected as cipher mechanism")
+                print("not complete")
+            else:
+                print("No cipher mechanism specifed in config file, returning to main menu")
 
 def ttsOutMain():
     print ("Not done")
@@ -364,7 +406,7 @@ def main():
     parseConfig()
     if checkFilePaths() == False:
         print ("Main directory does not exist, exiting")
-        print ("Make sure \"" + main_dir + "\", \"/audio\", and \"/audio/" + fc_prefn + "\" exist")
+        print ("Make sure \"" + main_dir + "\",", "\"/otp\",", "\"/audio\", and \"/audio/" + fc_prefn + "\" exist within the working directory")
     elif checkFilePaths() == True:
         print ("Init done \n")
         showMenu()

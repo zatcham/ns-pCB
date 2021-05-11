@@ -67,3 +67,10 @@ The config file can be opened in any decent text editor (so this excludes vim ðŸ
   - Options:
           Any string will work, but I'd personally recommend keeping it short.
           
+### [OTP] :          
+- `cipher_type` :
+  - Default setting: `nspcb`
+  - Options:
+          This option allows you to select what cipher you would want to use for your message.
+          `nspcb` will not cipher the text beyond the OTP, which is utilised with every cipher method.
+          `tscipherlib` will utilise tscipherlib (https://github.com/tomrow/tscipherlib) in conjunction with the OTP. You must enter a numerical key (integer) at time of running.
