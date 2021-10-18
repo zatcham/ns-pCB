@@ -1,6 +1,6 @@
 ## ns-pCB (number station - project Cherry Blossom)
 ## Developed by Zach Matcham (zatcham)
-## Version 0.42a | 11/5/21
+## Version 0.45a | 1/5/21
 
 # Imports
 import sys
@@ -14,7 +14,7 @@ import pandas as pd
 from fpdf import FPDF
 from pydub import AudioSegment
 import configparser
-from tscipherlib import cencode
+from tscipherlib import cencodeh
 import nsCB_otpgen
 import nsCB_tts
 
@@ -41,13 +41,7 @@ main_dir = os.getcwd()
 def checkFilePaths():
     if os.path.exists(main_dir):
         if os.path.exists(main_dir + "/audio"):
-            if os.path.exists(main_dir + "/otp"):
-                if os.path.exists(main_dir + "/audio/" + fc_prefn):
-                    return True
-                else:
-                    return False
-            else:
-                return False
+            return True
         else:
             return False
     else:
@@ -165,75 +159,72 @@ def hasNumbers(inputString):
 # generates pdf for otps based off csv using fpdf
 def generatePDF():
     print ("\n ns-pCB - OTP PDF Creation \n")
-    try:
-        print ("Generating PDFs from latest OTP CSVs \n")
-        date_now = datetime.now()
-        date_1 = date_now.strftime("%d/%m/%y %H:%M:%S")
-        date_2 = date_now.strftime("%d%m%y-%H%M%S")
-        print ("File name is " + 'OTP ' + date_2 + '.pdf' + "\n")
-        p = Path (main_dir + "/otp/")
-        p1 = max([fn for fn in p.glob('*OTPNum*.csv')], key=lambda f: f.stat().st_mtime)
-        p2 = max([fn for fn in p.glob('*OTPLC*.csv')], key=lambda f: f.stat().st_mtime)
-        p3 = max([fn for fn in p.glob('*OTPUC*.csv')], key=lambda f: f.stat().st_mtime)
-        with open(p1, newline='') as f1, open(p2, newline='') as f2, open(p3, newline='') as f3:
-            n_reader = csv.reader(f1)
-            lc_reader = csv.reader(f2)
-            uc_reader = csv.reader(f3)
-            pdf = FPDF()
-            pdf.add_page()
-            page_width = pdf.w - 2 * pdf.l_margin
-            pdf.set_font('Courier', '', 14.0) 
-            pdf.cell(page_width, 0.0, 'ns-pCB OTP - Exported: ' + date_1, align='C')
-            pdf.ln(10)
-            pdf.set_font('Courier', '', 12)
-            col_width = page_width/4
-            pdf.ln(1)
-            th = pdf.font_size
-            pdf.ln(4)
-            pdf.cell(page_width, 10.0, 'Double hyphen = space ', align='L')
-            pdf.ln(10)
-            pdf.ln(4)
-            pdf.cell(page_width, 10.0, 'Numbers: ', align='L')
-            pdf.ln(10)
-            for row in n_reader:
-                pdf.cell(col_width, th, str(row[0]), border=1)
-                pdf.cell(col_width, th, row[1], border=1)
-                pdf.ln(th)
-            pdf.ln(4)
-            pdf.cell(page_width, 10.0, 'Lowercase: ', align='L')
-            pdf.ln(10)
-            for row in lc_reader:
-                pdf.cell(col_width, th, str(row[0]), border=1)
-                pdf.cell(col_width, th, row[1], border=1)
-                pdf.ln(th)
-            pdf.ln(4)
-            pdf.cell(page_width, 10.0, 'Uppercase: ', align='L')
-            pdf.ln(10)
-            for row in uc_reader:
-                pdf.cell(col_width, th, str(row[0]), border=1)
-                pdf.cell(col_width, th, row[1], border=1)
-                pdf.ln(th)
-            pdf.ln(10)
-            pdf.set_font('Times','',10.0) 
-            pdf.cell(page_width, 0.0, '- end of report -', align='C')
-            pdf.output('OTP ' + date_2 + '.pdf', 'F')
-    except ValueError as error:
-        print ("Error, most likely missing OTP file")
-        print (error)
-        print ("\n")
-        return "err"
+    print ("Generating PDFs from latest OTP CSVs \n")
+    date_now = datetime.now()
+    date_1 = date_now.strftime("%d/%m/%y %H:%M:%S")
+    date_2 = date_now.strftime("%d%m%y-%H%M%S")
+    print ("File name is " + 'OTP ' + date_2 + '.pdf' + "\n")
+    p = Path (main_dir + "/otp/")
+    p1 = max([fn for fn in p.glob('*OTPNum*.csv')], key=lambda f: f.stat().st_mtime)
+    p2 = max([fn for fn in p.glob('*OTPLC*.csv')], key=lambda f: f.stat().st_mtime)
+    p3 = max([fn for fn in p.glob('*OTPUC*.csv')], key=lambda f: f.stat().st_mtime)
+    with open(p1, newline='') as f1, open(p2, newline='') as f2, open(p3, newline='') as f3:
+        n_reader = csv.reader(f1)
+        lc_reader = csv.reader(f2)
+        uc_reader = csv.reader(f3)
+        pdf = FPDF()
+        pdf.add_page()
+        page_width = pdf.w - 2 * pdf.l_margin
+        pdf.set_font('Courier', '', 14.0) 
+        pdf.cell(page_width, 0.0, 'ns-pCB OTP - Exported: ' + date_1, align='C')
+        pdf.ln(10)
+        pdf.set_font('Courier', '', 12)
+        col_width = page_width/4
+        pdf.ln(1)
+        th = pdf.font_size
+        pdf.ln(4)
+        pdf.cell(page_width, 10.0, 'Double hyphen = space ', align='L')
+        pdf.ln(10)
+        pdf.ln(4)
+        pdf.cell(page_width, 10.0, 'Numbers: ', align='L')
+        pdf.ln(10)
+        for row in n_reader:
+            pdf.cell(col_width, th, str(row[0]), border=1)
+            pdf.cell(col_width, th, row[1], border=1)
+            pdf.ln(th)
+        pdf.ln(4)
+        pdf.cell(page_width, 10.0, 'Lowercase: ', align='L')
+        pdf.ln(10)
+        for row in lc_reader:
+            pdf.cell(col_width, th, str(row[0]), border=1)
+            pdf.cell(col_width, th, row[1], border=1)
+            pdf.ln(th)
+        pdf.ln(4)
+        pdf.cell(page_width, 10.0, 'Uppercase: ', align='L')
+        pdf.ln(10)
+        for row in uc_reader:
+            pdf.cell(col_width, th, str(row[0]), border=1)
+            pdf.cell(col_width, th, row[1], border=1)
+            pdf.ln(th)
+        pdf.ln(10)
+        pdf.set_font('Times','',10.0) 
+        pdf.cell(page_width, 0.0, '- end of report -', align='C')
+        pdf.output('OTP ' + date_2 + '.pdf', 'F')
 
-# merges audio files , preamble and tts, using pydub
+# merges audio files , preamble and tts, using pydub // this should only be called once file created
 def mergeAudio():
     p = Path (main_dir + "/audio/")
+    of = max([fn for fn in p.glob('*.mp3')], key=lambda f: f.stat().st_mtime)
     s1 = AudioSegment.from_mp3(max([fn for fn in p.glob('*.mp3')], key=lambda f: f.stat().st_mtime))
-    s2 = AudioSegment.from_mp3(main_dir + "/audio/" + fc_prefn)
+    s2 = AudioSegment.from_mp3("audio/preamble.mp3")
     silence = AudioSegment.silent(duration=2000)
     out = s2 + silence + s1
     date_now = datetime.now()
     date_1 = date_now.strftime("%d%m%y-%H%M%S")
     date_file = (main_dir + "/audio/" + date_1 +  "-merge.mp3")
     out.export(date_file, format="mp3")
+    if fc_keepog == "false":  # bool as str due to conf file handing
+        os.remove(of)  # use this var as latest mp3 will be different
 
 def checkOTPUsage():
     if os.path.isfile("otp.cb"):
@@ -288,9 +279,10 @@ def parseConfig():
     fc_ttstype = conf.get("TTS", "tts_mode")
     global fc_nscbmode
     fc_nscbmode = conf.get("TTS", "nscb_mode")
-    global fc_cmode
-    fc_cmode = conf.get("OTP", "cipher_type")
-
+    global fc_otpnl # add otp option
+    fc_otpnl = conf.get("OTP", "otp_numlength")
+    global fc_keepog
+    fc_keepog = conf.get("Station", "keeporiginal")
 # 2 - Mains
 
 # main menu
@@ -323,70 +315,30 @@ def ttsGenMain():
     print ("\n ns-pCB - TTS Generation \n")
     if checkOTPUsage() == True:
         print ("This OTP has been used for. Continue?")
-        x = input("Y for Yes, or any key to go back ")
+        x = input("Y for Yes, or any key to go back")
         if x == "Y": 
             if importCSVs() == "err":
-                print ("Please generate an OTP file and try again.\n")
+                print ("")
             else:
                 st = input ("String to convert (no special chars): ")
                 strotp_list.clear()
                 stringToOTP(st)
                 print(strotp_list)
-                if fc_cmode == "tscipherlib":
-                    print ("tscipherlib selected as cipher mechanism")
-                    a = input("Enter key to cipher with (must be an integer): ")
-                    otp_str = ""
-                    for element in strotp_list:
-                        otp_str += element
-                        otp_str += ","
-                    outtotts = fc_statidnt + "   " + str(cencode(otp_str, int(a)))
-                    print (outtotts)
-                    generateTTS(outtotts)
-                    mergeAudio()
-                    incOTPUsage("i")
-                elif fc_cmode == "nspcb":
-                    print ("nspcb selected as cipher mechanism")
-                    outtotts = fc_statidnt + "   " + str(strotp_list)
-                    generateTTS(outtotts)
-                    mergeAudio()
-                    incOTPUsage("i")
-                elif fc_cmode == "vernam":
-                    print ("Vernam selected as cipher mechanism")
-                    print ("not complete")
-                else:
-                    print ("No cipher mechanism specifed in config file, returning to main menu")
-    else:
-        print ("OTP not used before, proceeding.")
-        if importCSVs() == "err":
-            print ("Please generate an OTP file and try again.\n")
-        else:
-            st = input ("String to convert (no special chars): ")
-            strotp_list.clear()
-            stringToOTP(st)
-            print(strotp_list)
-            if fc_cmode == "tscipherlib":
-                print("tscipherlib selected as cipher mechanism")
-                a = input("Enter key to cipher with (must be an integer): ")
-                otp_str = ""
-                for element in strotp_list:
-                    otp_str += element
-                    otp_str += ","
-                outtotts = fc_statidnt + "   " + str(cencode(otp_str, int(a)))
-                print(outtotts)
-                generateTTS(outtotts)
-                mergeAudio()
-                incOTPUsage("i")
-            elif fc_cmode == "nspcb":
-                print("nspcb selected as cipher mechanism")
                 outtotts = fc_statidnt + "   " + str(strotp_list)
                 generateTTS(outtotts)
                 mergeAudio()
                 incOTPUsage("i")
-            elif fc_cmode == "vernam":
-                print("Vernam selected as cipher mechanism")
-                print("not complete")
-            else:
-                print("No cipher mechanism specifed in config file, returning to main menu")
+    else:
+        print ("OTP not used before, proceeding.")
+        importCSVs()
+        st = input ("String to convert (no special chars): ")
+        strotp_list.clear()
+        stringToOTP(st)
+        print(strotp_list)
+        generateTTS(str(strotp_list))
+        mergeAudio()
+        incOTPUsage("i")
+
 
 def ttsOutMain():
     print ("Not done")
@@ -403,10 +355,9 @@ def otpGenMain():
 
 def main():
     print ("ns-pCB Initialisation:")
-    parseConfig()
     if checkFilePaths() == False:
         print ("Main directory does not exist, exiting")
-        print ("Make sure \"" + main_dir + "\",", "\"/otp\",", "\"/audio\", and \"/audio/" + fc_prefn + "\" exist within the working directory")
+        print ("Make sure " + main_dir + " exists and /audio")
     elif checkFilePaths() == True:
         print ("Init done \n")
         showMenu()

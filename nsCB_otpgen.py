@@ -9,26 +9,32 @@ from random import randint
 from datetime import datetime
 import pandas as pd
 
+
 # RNG
 def newSeed():
     unixtime = time.time()
-    ran_time = randint(randint(2,90000), randint(90001,330920))
+    ran_time = randint(randint(2, 90000), randint(100001, 330920))
     if unixtime > ran_time:
         ran_seed = unixtime - ran_time
+        return ran_seed
     elif unixtime < ran_time:
         ran_seed = ran_time - unixtime
+        return ran_seed
     else:
-        print ("error")
-    return ran_seed
+        print("error")
+        exit()
+        return False
 
 def ranGen():
     ran_val = randint(100, 999)
     return ran_val
 
+
 def generateDate():
     date_now = datetime.now()
     date_1 = date_now.strftime("%d%m%y-%H%M%S")
     return date_1
+
 
 # Dicts
 lower_alphabet = {
@@ -102,6 +108,7 @@ numbers = {
     "9": "0"
 }
 
+
 # Iterate for numbers
 def generateNum(withOutput):
     for key, value in numbers.items():
@@ -111,6 +118,7 @@ def generateNum(withOutput):
         if withOutput:
             print(key, '->', numbers[key])
 
+
 def generateLA(withOutput):
     for key, value in lower_alphabet.items():
         seed(newSeed())
@@ -119,6 +127,7 @@ def generateLA(withOutput):
         if withOutput:
             print(key, '->', lower_alphabet[key])
 
+
 def generateUA(withOutput):
     for key, value in upper_alphabet.items():
         seed(newSeed())
@@ -126,6 +135,7 @@ def generateUA(withOutput):
             upper_alphabet.update({key: ranGen()})
         if withOutput:
             print(key, '->', upper_alphabet[key])
+
 
 def checkForDuplicate():
     # i = 1
@@ -159,7 +169,7 @@ def checkForDuplicate():
     for key, value in lower_alphabet.items():
         if value in upper_alphabet.values():
             print("Duplicate between lowercase and uppercase!")
-            print (key, value)
+            print(key, value)
             print("Exiting!")
             exit()
     for key_1 in lower_alphabet:
@@ -175,26 +185,27 @@ def checkForDuplicate():
     for key, value in lower_alphabet.items():
         if value in numbers.values():
             print("Duplicate between lowercase and numbers!")
-            print (key, value)
+            print(key, value)
             print("Exiting!")
             exit()
     for key, value in upper_alphabet.items():
         if value in numbers.values():
             print("Duplicate between uppercase and numbers!")
-            print (key, value)
+            print(key, value)
             print("Exiting!")
             exit()
         if value in upper_alphabet.values():
-            print ("Duplicate within uppercase!")
-            print (key, value)
+            print("Duplicate within uppercase!")
+            print(key, value)
             print("Exiting!")
             exit()
     for key, value in numbers.items():
         if value in numbers.items():
-            print ("Duplicate within numbers!")
-            print (key, value)
+            print("Duplicate within numbers!")
+            print(key, value)
             print("Exiting!")
             exit()
+
 
 # thx tom
 def checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
@@ -202,7 +213,8 @@ def checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
     for iKey, iValue in lower_alphabet.items():
         if (iKey != origKey) and (iValue == origValue):
             if debugPrint:
-                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
+                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(
+                    origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
             if killProgram:
                 print("A duplicate has been found, exiting")
                 exit()
@@ -213,7 +225,8 @@ def checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
     for iKey, iValue in upper_alphabet.items():
         if (iKey != origKey) and (iValue == origValue):
             if debugPrint:
-                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
+                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(
+                    origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
             if killProgram:
                 print("A duplicate has been found, exiting")
                 exit()
@@ -224,7 +237,8 @@ def checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
     for iKey, iValue in numbers.items():
         if (iKey != origKey) and (iValue == origValue):
             if debugPrint:
-                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
+                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(
+                    origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
             if killProgram:
                 print("A duplicate has been found, exiting")
                 exit()
@@ -233,6 +247,7 @@ def checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
             # toReturn = iKey
             break
     return False
+
 
 def checkAllForDupes(killProgram, debugPrint, returnVal):
     for origKey, origValue in lower_alphabet.items():
@@ -246,14 +261,15 @@ def checkAllForDupes(killProgram, debugPrint, returnVal):
             return True
     return False
 
+
 def generateAll(withOutput):
     i = 0
     if i == 0:
-        print ("Generating Numbers")
+        print("Generating Numbers")
         generateNum(withOutput)
-        print ("Generating lowercase alphabet")
+        print("Generating lowercase alphabet")
         generateLA(withOutput)
-        print ("Generating uppercase alphabet")
+        print("Generating uppercase alphabet")
         generateUA(withOutput)
         if checkAllForDupes(False, True, True):
             while checkAllForDupes(False, True, True):
@@ -269,17 +285,18 @@ def generateAll(withOutput):
                 generateUA(withOutput)
                 i += 1
             print("----")
-            print ("Amount of duplicates found: " + str(i))
+            print("Amount of duplicates found: " + str(i))
             print("----")
             return True
         else:
             return True
 
+
 def resetDicts(withOutput):
     for key, value in lower_alphabet.items():
         lower_alphabet.update({key: "0"})
         if withOutput:
-            print("changed key "+key+" to 0")
+            print("changed key " + key + " to 0")
     for key, value in upper_alphabet.items():
         upper_alphabet.update({key: "0"})
         if withOutput:
@@ -289,20 +306,21 @@ def resetDicts(withOutput):
         if withOutput:
             print("changed key " + key + " to 0")
     if withOutput:
-        print ("Reset all keys to 0")
+        print("Reset all keys to 0")
 
 
 def touch(path):
     open(path, 'a').close()
 
+
 def otp_main():
     if generateAll(False):
         # CSV out
         date_fn = str(generateDate())
-        print ("Exporting OTPs to CSV")
-        print ("File names will be: \n Numbers: OTPNum-" + date_fn + ".csv" 
-        "\n Lowercase: OTPLC-" + date_fn + ".csv" +
-        "\n Uppercase: OTPUC-" + date_fn + ".csv")
+        print("Exporting OTPs to CSV")
+        print("File names will be: \n Numbers: OTPNum-" + date_fn + ".csv"
+            "\n Lowercase: OTPLC-" + date_fn + ".csv" +
+            "\n Uppercase: OTPUC-" + date_fn + ".csv")
         touch("otp/OTPNum-" + date_fn + ".csv")
         touch("otp/OTPLC-" + date_fn + ".csv")
         touch("otp/OTPUC-" + date_fn + ".csv")
@@ -313,6 +331,7 @@ def otp_main():
         lcf.to_csv("otp/OTPLC-" + date_fn + ".csv")
         ucf = pd.DataFrame.from_dict(upper_alphabet, orient="index")
         ucf.to_csv("otp/OTPUC-" + date_fn + ".csv")
+
 
 if __name__ == "__main__":
     otp_main()

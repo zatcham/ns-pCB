@@ -1,0 +1,7 @@
+## ns-pCB Python requirements
+
+gtts
+pandas
+fpdf
+pydub
+pygame

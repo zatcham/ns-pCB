@@ -15,7 +15,7 @@ def cencodeh(text,key):
     random.seed(key)
     for h in range(len(text)):
         i = h + 1
-        chara = hex((ord(text[h])+cscramble(i,key))%255)
+        chara = hex((ord(text[h])+cscramble(i,key)) %255)
         chara = chara[2:]
         while len(chara)<2:
             chara = "0" + chara
@@ -37,19 +37,27 @@ def cscramble(iterate,key):
     interim += math.floor(iterate/3)
     interim += iterate*2
     interim += math.floor(9*math.sin(math.radians(iterate*2)))  #add 9sin(iterate*2) with the decimal point chopped off
+    print (interim)
     #interim += random.randint(0,200) #REMOVE!
     for i in range(6):
         interimb = math.sin(math.radians(key*2)) * (2**32) #make a very big number using key*2
         interimb = math.floor(interimb) #make it int
         interimb = interimb*3 ^ (iterate*7) #xor (iterate*7)
+        #print (interimb)
         interimc = interimb >> 5
         interimc = interimc << 5 #chop off a few bits
+        #print (interimc)
         interimd = interimc << 3 #make another one
         interime = interimb ^ interimc
         interime += interimd
+        # print (interime)
         interim -= interime
+        #print (interim)
+    #print (interim)
     interim = interim % 255
-    return interim+25
+    print (interim)
+    #print (interim+255)
+    return interim+255
                        
 def cdecode(array,key):
     output = ""
@@ -107,7 +115,10 @@ def cdecodeh(stringin,key):
 if __name__ == "__main__":
     # execute only if run as a script
 
-    print(cdecode(cencode("hello", 1),1))
-    a=cencode("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1)
-    for j in range(len(a)):
-        print(" "*math.floor(a[j]/2)+"#")
+    # print(cdecode(cencode("hello", 1),1))
+    # a=cencode("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 1)
+    # for j in range(len(a)):
+    #     print(" "*math.floor(a[j]/2)+"#")
+    #print(cencode("test", 1))
+    print (cdecode([171, 214, 95, 155], 1))
+    #print (chr(79))
