@@ -1,336 +1,302 @@
-## ns-pCB (number station - project Cherry Blossom)
-## OTP Generation module
-## Developed by Zach Matcham (zatcham)
-## Version 0.4 | 7/6/21
+"""
+ns-pCB (number station - project Cherry Blossom)
+OTP Generation Module - Object-Oriented Implementation
+Developed by Zach Matcham (zatcham)
+Version 1.0 | 2025
+
+This module provides OTP (One-Time Pad) generation with duplicate detection
+and CSV export functionality.
+"""
 
 import time
-from random import seed
-from random import randint
+from random import seed, randint
 from datetime import datetime
+from typing import Dict, List, Tuple
 import pandas as pd
 
 
-# RNG
-def newSeed():
-    unixtime = time.time()
-    ran_time = randint(randint(2, 90000), randint(100001, 330920))
-    if unixtime > ran_time:
-        ran_seed = unixtime - ran_time
-        return ran_seed
-    elif unixtime < ran_time:
-        ran_seed = ran_time - unixtime
-        return ran_seed
-    else:
-        print("error")
-        exit()
+class RandomNumberGenerator:
+    """Generates random numbers with time-based seeding."""
+    
+    @staticmethod
+    def generate_seed() -> float:
+        """
+        Generate a random seed based on Unix time.
+        
+        Returns:
+            Random seed value
+        """
+        unixtime = time.time()
+        ran_time = randint(randint(2, 90000), randint(100001, 330920))
+        
+        if unixtime > ran_time:
+            return unixtime - ran_time
+        elif unixtime < ran_time:
+            return ran_time - unixtime
+        else:
+            raise ValueError("Unable to generate seed: time values are equal")
+    
+    @staticmethod
+    def generate_number() -> int:
+        """
+        Generate a random 3-digit number.
+        
+        Returns:
+            Random number between 100 and 999
+        """
+        return randint(100, 999)
+
+
+class OTPDictionary:
+    """Represents a dictionary of OTP mappings."""
+    
+    def __init__(self, name: str, keys: List[str]):
+        """
+        Initialize OTP dictionary.
+        
+        Args:
+            name: Name of the dictionary (e.g., "Numbers", "Lowercase")
+            keys: List of keys to map
+        """
+        self.name: str = name
+        self.mappings: Dict[str, int] = {key: 0 for key in keys}
+        self.rng: RandomNumberGenerator = RandomNumberGenerator()
+    
+    def generate(self, with_output: bool = False) -> None:
+        """
+        Generate random OTP codes for all keys.
+        
+        Args:
+            with_output: Whether to print generation progress
+        """
+        for key in self.mappings.keys():
+            seed(self.rng.generate_seed())
+            self.mappings[key] = self.rng.generate_number()
+            
+            if with_output:
+                print(f"{key} -> {self.mappings[key]}")
+    
+    def reset(self, with_output: bool = False) -> None:
+        """
+        Reset all mappings to zero.
+        
+        Args:
+            with_output: Whether to print reset progress
+        """
+        for key in self.mappings.keys():
+            self.mappings[key] = 0
+            
+            if with_output:
+                print(f"Changed key {key} to 0")
+        
+        if with_output:
+            print("Reset all keys to 0")
+    
+    def has_duplicates_with(self, other: 'OTPDictionary') -> bool:
+        """
+        Check if this dictionary has duplicate values with another.
+        
+        Args:
+            other: Another OTP dictionary to compare with
+            
+        Returns:
+            True if duplicates found, False otherwise
+        """
+        self_values = set(self.mappings.values())
+        other_values = set(other.mappings.values())
+        
+        return bool(self_values & other_values)
+    
+    def has_internal_duplicates(self) -> bool:
+        """
+        Check if this dictionary has duplicate values internally.
+        
+        Returns:
+            True if internal duplicates found, False otherwise
+        """
+        values = list(self.mappings.values())
+        return len(values) != len(set(values))
+    
+    def to_dataframe(self) -> pd.DataFrame:
+        """
+        Convert dictionary to pandas DataFrame.
+        
+        Returns:
+            DataFrame with mappings
+        """
+        return pd.DataFrame.from_dict(self.mappings, orient="index")
+    
+    def save_to_csv(self, filepath: str) -> None:
+        """
+        Save dictionary to CSV file.
+        
+        Args:
+            filepath: Path to output CSV file
+        """
+        df = self.to_dataframe()
+        df.to_csv(filepath)
+
+
+class DuplicateChecker:
+    """Checks for duplicate values across OTP dictionaries."""
+    
+    @staticmethod
+    def check_for_duplicates(dicts: List[OTPDictionary], 
+                            debug_print: bool = False) -> bool:
+        """
+        Check all dictionaries for duplicates.
+        
+        Args:
+            dicts: List of OTP dictionaries to check
+            debug_print: Whether to print duplicate information
+            
+        Returns:
+            True if duplicates found, False otherwise
+        """
+        # Check for internal duplicates
+        for dictionary in dicts:
+            if dictionary.has_internal_duplicates():
+                if debug_print:
+                    print(f"Internal duplicate found in {dictionary.name}")
+                return True
+        
+        # Check for cross-dictionary duplicates
+        for i, dict1 in enumerate(dicts):
+            for dict2 in dicts[i+1:]:
+                if dict1.has_duplicates_with(dict2):
+                    if debug_print:
+                        print(f"Duplicate found between {dict1.name} and {dict2.name}")
+                    return True
+        
         return False
 
-def ranGen():
-    ran_val = randint(100, 999)
-    return ran_val
 
-
-def generateDate():
-    date_now = datetime.now()
-    date_1 = date_now.strftime("%d%m%y-%H%M%S")
-    return date_1
-
-
-# Dicts
-lower_alphabet = {
-    "a": "0",
-    "b": "0",
-    "c": "0",
-    "d": "0",
-    "e": "0",
-    "f": "0",
-    "g": "0",
-    "h": "0",
-    "i": "0",
-    "j": "0",
-    "k": "0",
-    "l": "0",
-    "m": "0",
-    "n": "0",
-    "o": "0",
-    "p": "0",
-    "q": "0",
-    "r": "0",
-    "s": "0",
-    "t": "0",
-    "u": "0",
-    "v": "0",
-    "w": "0",
-    "x": "0",
-    "y": "0",
-    "z": "0"
-}
-
-upper_alphabet = {
-    "A": "0",
-    "B": "0",
-    "C": "0",
-    "D": "0",
-    "E": "0",
-    "F": "0",
-    "G": "0",
-    "H": "0",
-    "I": "0",
-    "J": "0",
-    "K": "0",
-    "L": "0",
-    "M": "0",
-    "N": "0",
-    "O": "0",
-    "P": "0",
-    "Q": "0",
-    "R": "0",
-    "S": "0",
-    "T": "0",
-    "U": "0",
-    "V": "0",
-    "W": "0",
-    "X": "0",
-    "Y": "0",
-    "Z": "0"
-}
-
-numbers = {
-    "0": "0",
-    "1": "0",
-    "2": "0",
-    "3": "0",
-    "4": "0",
-    "5": "0",
-    "6": "0",
-    "7": "0",
-    "8": "0",
-    "9": "0"
-}
-
-
-# Iterate for numbers
-def generateNum(withOutput):
-    for key, value in numbers.items():
-        seed(newSeed())
-        if value == "0":
-            numbers.update({key: ranGen()})
-        if withOutput:
-            print(key, '->', numbers[key])
-
-
-def generateLA(withOutput):
-    for key, value in lower_alphabet.items():
-        seed(newSeed())
-        if value == "0":
-            lower_alphabet.update({key: ranGen()})
-        if withOutput:
-            print(key, '->', lower_alphabet[key])
-
-
-def generateUA(withOutput):
-    for key, value in upper_alphabet.items():
-        seed(newSeed())
-        if value == "0":
-            upper_alphabet.update({key: ranGen()})
-        if withOutput:
-            print(key, '->', upper_alphabet[key])
-
-
-def checkForDuplicate():
-    # i = 1
-    # while i < 26:
-    #     if lower_alphabet[i] == upper_alphabet[i]:
-    #         print ("Duplicate between lowercase and uppercase!")
-    #         print ("Exiting!")
-    #         exit()
-    #     elif lower_alphabet[i] == numbers[i]:
-    #         print ("Duplicate between lowercase and numbers!")
-    #         print ("Exiting!")
-    #         exit()
-    #     elif upper_alphabet[i] == numbers[i]:
-    #         print ("Duplicate between uppercase and numbers!")
-    #         print ("Exiting!")
-    #         exit()
-    #     else:
-    #         i += 1
-    # if lower_alphabet.values() in upper_alphabet.values():
-    #     print ("Duplicate between lowercase and uppercase!")
-    #     print ("Exiting!")
-    #     exit()
-    # elif lower_alphabet.values() in numbers.values():
-    #     print ("Duplicate between lowercase and numbers!")
-    #     print ("Exiting!")
-    #     exit()
-    # elif upper_alphabet.values() in numbers.values():
-    #     print ("Duplicate between uppercase and numbers!")
-    #     print ("Exiting!")
-    #     exit()
-    for key, value in lower_alphabet.items():
-        if value in upper_alphabet.values():
-            print("Duplicate between lowercase and uppercase!")
-            print(key, value)
-            print("Exiting!")
-            exit()
-    for key_1 in lower_alphabet:
-        for key_2 in lower_alphabet:
-            if key_1 == key_2:
-                break
-            for item in lower_alphabet[key_1]:
-                if item in lower_alphabet[key_2]:
-                    print("Duplicate between lowercase!")
-                    print(key, value)
-                    print("Exiting!")
-                    exit()
-    for key, value in lower_alphabet.items():
-        if value in numbers.values():
-            print("Duplicate between lowercase and numbers!")
-            print(key, value)
-            print("Exiting!")
-            exit()
-    for key, value in upper_alphabet.items():
-        if value in numbers.values():
-            print("Duplicate between uppercase and numbers!")
-            print(key, value)
-            print("Exiting!")
-            exit()
-        if value in upper_alphabet.values():
-            print("Duplicate within uppercase!")
-            print(key, value)
-            print("Exiting!")
-            exit()
-    for key, value in numbers.items():
-        if value in numbers.items():
-            print("Duplicate within numbers!")
-            print(key, value)
-            print("Exiting!")
-            exit()
-
-
-# thx tom
-def checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
-    # toReturn = None
-    for iKey, iValue in lower_alphabet.items():
-        if (iKey != origKey) and (iValue == origValue):
-            if debugPrint:
-                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(
-                    origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
-            if killProgram:
-                print("A duplicate has been found, exiting")
-                exit()
-            if returnVal:
-                return True
-            # toReturn = iKey
-            break
-    for iKey, iValue in upper_alphabet.items():
-        if (iKey != origKey) and (iValue == origValue):
-            if debugPrint:
-                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(
-                    origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
-            if killProgram:
-                print("A duplicate has been found, exiting")
-                exit()
-            if returnVal:
-                return True
-            # toReturn = iKey
-            break
-    for iKey, iValue in numbers.items():
-        if (iKey != origKey) and (iValue == origValue):
-            if debugPrint:
-                print("Duplicate Found: \"" + str(iKey) + "\" and \"" + str(
-                    origKey) + "\" have a matching value: \n\"" + str(iValue) + "\", \"" + str(origValue) + "\"")
-            if killProgram:
-                print("A duplicate has been found, exiting")
-                exit()
-            if returnVal:
-                return True
-            # toReturn = iKey
-            break
-    return False
-
-
-def checkAllForDupes(killProgram, debugPrint, returnVal):
-    for origKey, origValue in lower_alphabet.items():
-        if checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
-            return True
-    for origKey, origValue in lower_alphabet.items():
-        if checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
-            return True
-    for origKey, origValue in lower_alphabet.items():
-        if checkSectionForDupe(origKey, origValue, killProgram, debugPrint, returnVal):
-            return True
-    return False
-
-
-def generateAll(withOutput):
-    i = 0
-    if i == 0:
+class OTPGenerator:
+    """Main OTP generator coordinating all dictionaries."""
+    
+    def __init__(self):
+        """Initialize OTP generator with all required dictionaries."""
+        # Define keys for each dictionary
+        number_keys = [str(i) for i in range(10)]
+        lowercase_keys = [chr(i) for i in range(ord('a'), ord('z') + 1)]
+        uppercase_keys = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+        
+        # Create dictionaries
+        self.numbers = OTPDictionary("Numbers", number_keys)
+        self.lowercase = OTPDictionary("Lowercase", lowercase_keys)
+        self.uppercase = OTPDictionary("Uppercase", uppercase_keys)
+        
+        self.checker = DuplicateChecker()
+    
+    def generate_all(self, with_output: bool = False) -> bool:
+        """
+        Generate OTPs for all dictionaries, ensuring no duplicates.
+        
+        Args:
+            with_output: Whether to print generation progress
+            
+        Returns:
+            True if generation successful
+        """
+        attempt_count = 0
+        dictionaries = [self.numbers, self.lowercase, self.uppercase]
+        
+        # Initial generation
         print("Generating Numbers")
-        generateNum(withOutput)
+        self.numbers.generate(with_output)
+        
         print("Generating lowercase alphabet")
-        generateLA(withOutput)
+        self.lowercase.generate(with_output)
+        
         print("Generating uppercase alphabet")
-        generateUA(withOutput)
-        if checkAllForDupes(False, True, True):
-            while checkAllForDupes(False, True, True):
-                time.sleep(2)
-                resetDicts(withOutput)
-                print("----")
-                print("Regenerating due to duplicates")
-                print("Regenerating Numbers")
-                generateNum(withOutput)
-                print("Regenerating lowercase alphabet")
-                generateLA(withOutput)
-                print("Regenerating uppercase alphabet")
-                generateUA(withOutput)
-                i += 1
+        self.uppercase.generate(with_output)
+        
+        # Check for duplicates and regenerate if needed
+        while self.checker.check_for_duplicates(dictionaries, debug_print=True):
+            time.sleep(2)
+            attempt_count += 1
+            
             print("----")
-            print("Amount of duplicates found: " + str(i))
+            print("Regenerating due to duplicates")
+            
+            # Reset all dictionaries
+            for dictionary in dictionaries:
+                dictionary.reset(with_output)
+            
+            # Regenerate
+            print("Regenerating Numbers")
+            self.numbers.generate(with_output)
+            
+            print("Regenerating lowercase alphabet")
+            self.lowercase.generate(with_output)
+            
+            print("Regenerating uppercase alphabet")
+            self.uppercase.generate(with_output)
+        
+        if attempt_count > 0:
             print("----")
-            return True
-        else:
-            return True
+            print(f"Amount of duplicates found: {attempt_count}")
+            print("----")
+        
+        return True
+    
+    def export_to_csv(self, date_str: str, output_dir: str = "otp") -> Tuple[str, str, str]:
+        """
+        Export all OTP dictionaries to CSV files.
+        
+        Args:
+            date_str: Date string for filename
+            output_dir: Output directory for CSV files
+            
+        Returns:
+            Tuple of (numbers_file, lowercase_file, uppercase_file)
+        """
+        num_file = f"{output_dir}/OTPNum-{date_str}.csv"
+        lc_file = f"{output_dir}/OTPLC-{date_str}.csv"
+        uc_file = f"{output_dir}/OTPUC-{date_str}.csv"
+        
+        # Create files
+        open(num_file, 'a').close()
+        open(lc_file, 'a').close()
+        open(uc_file, 'a').close()
+        
+        # Save to CSV
+        self.numbers.save_to_csv(num_file)
+        self.lowercase.save_to_csv(lc_file)
+        self.uppercase.save_to_csv(uc_file)
+        
+        return num_file, lc_file, uc_file
 
 
-def resetDicts(withOutput):
-    for key, value in lower_alphabet.items():
-        lower_alphabet.update({key: "0"})
-        if withOutput:
-            print("changed key " + key + " to 0")
-    for key, value in upper_alphabet.items():
-        upper_alphabet.update({key: "0"})
-        if withOutput:
-            print("changed key " + key + " to 0")
-    for key, value in numbers.items():
-        numbers.update({key: "0"})
-        if withOutput:
-            print("changed key " + key + " to 0")
-    if withOutput:
-        print("Reset all keys to 0")
+def generate_date_string() -> str:
+    """
+    Generate date string for filenames.
+    
+    Returns:
+        Formatted date string
+    """
+    date_now = datetime.now()
+    return date_now.strftime("%d%m%y-%H%M%S")
 
 
-def touch(path):
-    open(path, 'a').close()
-
-
-def otp_main():
-    if generateAll(False):
-        # CSV out
-        date_fn = str(generateDate())
+def otp_main() -> None:
+    """Main entry point for OTP generation."""
+    generator = OTPGenerator()
+    
+    if generator.generate_all(with_output=False):
+        # Generate date string for filenames
+        date_str = generate_date_string()
+        
         print("Exporting OTPs to CSV")
-        print("File names will be: \n Numbers: OTPNum-" + date_fn + ".csv"
-            "\n Lowercase: OTPLC-" + date_fn + ".csv" +
-            "\n Uppercase: OTPUC-" + date_fn + ".csv")
-        touch("otp/OTPNum-" + date_fn + ".csv")
-        touch("otp/OTPLC-" + date_fn + ".csv")
-        touch("otp/OTPUC-" + date_fn + ".csv")
-
-        nf = pd.DataFrame.from_dict(numbers, orient="index")
-        nf.to_csv("otp/OTPNum-" + date_fn + ".csv")
-        lcf = pd.DataFrame.from_dict(lower_alphabet, orient="index")
-        lcf.to_csv("otp/OTPLC-" + date_fn + ".csv")
-        ucf = pd.DataFrame.from_dict(upper_alphabet, orient="index")
-        ucf.to_csv("otp/OTPUC-" + date_fn + ".csv")
+        print(f"File names will be:\n"
+              f" Numbers: OTPNum-{date_str}.csv\n"
+              f" Lowercase: OTPLC-{date_str}.csv\n"
+              f" Uppercase: OTPUC-{date_str}.csv")
+        
+        # Export to CSV
+        generator.export_to_csv(date_str)
+        
+        print("OTP generation complete!")
 
 
 if __name__ == "__main__":
